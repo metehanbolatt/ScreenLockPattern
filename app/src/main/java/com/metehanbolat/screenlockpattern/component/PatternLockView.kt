@@ -204,5 +204,33 @@ class PatternLockView @JvmOverloads constructor(
         }
     }
 
+    private fun createRow(
+        view: LinearLayout,
+        layoutParams: ViewGroup.LayoutParams
+    ): LinearLayout {
+        view.apply {
+            addView(LinearLayout(context).apply {
+                this.layoutParams = layoutParams
+                this.gravity = Gravity.CENTER
+            })
+        }
+        return view.getChildAt(view.childCount - 1) as LinearLayout
+    }
+
+    private fun createColumn(
+        view: LinearLayout,
+        nodeKey: String
+    ) {
+        val margins = context.resources.getDimensionPixelSize(R.dimen.dot_view_margin)
+        view.apply {
+            addView(DotView(context).apply {
+                (layoutParams as MarginLayoutParams).setMargins(margins)
+                setDotViewColor(attrDotColor)
+                setKey(nodeKey)
+            })
+        }
+    }
+
     
+
 }
