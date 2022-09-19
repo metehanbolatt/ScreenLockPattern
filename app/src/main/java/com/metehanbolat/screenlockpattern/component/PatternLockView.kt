@@ -175,4 +175,34 @@ class PatternLockView @JvmOverloads constructor(
         }
     }
 
+    private fun drawPatternView(
+        rowSize: Int = 3,
+        columnSize: Int = 3,
+        layoutParams: ViewGroup.LayoutParams = LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            weight = 1f
+            gravity = Gravity.CENTER
+        },
+        nodeKeys: Array<Array<String>> = dotNumberKeyArray
+    ) {
+        for (rowIndex in 0 until rowSize) {
+            createRow(this@PatternLockView, layoutParams).apply {
+                for (columnIndex in 0 until columnSize) {
+                    createRow(this, LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        weight = 1f
+                        gravity = Gravity.CENTER
+                    }).run {
+                        createColumn(this, nodeKeys[rowIndex][columnIndex])
+                    }
+                }
+            }
+        }
+    }
+
+    
 }
