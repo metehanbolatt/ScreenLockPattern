@@ -258,4 +258,27 @@ class PatternLockView @JvmOverloads constructor(
 
     }
 
+    private fun drawLine(canvas: Canvas?) {
+        markedDotList.forEachIndexed { index, _ ->
+            if (index + 1 < markedDotList.size) {
+                canvas?.drawLine(
+                    (markedDotList[index].rightPoint + markedDotList[index].leftPoint) / 2f,
+                    (markedDotList[index].bottomPoint.toFloat() + markedDotList[index].topPoint.toFloat()) / 2f,
+                    (markedDotList[index + 1].rightPoint + markedDotList[index].leftPoint) / 2f,
+                    (markedDotList[index + 1].bottomPoint.toFloat() + markedDotList[index + 1].topPoint.toFloat()) / 2f,
+                    paint
+                )
+            }
+            if (state is PatternViewState.Started) {
+                canvas!!.drawLine(
+                    (markedDotList.last().rightPoint + markedDotList.last().leftPoint) / 2f,
+                    (markedDotList.last().bottomPoint.toFloat() + markedDotList.last().topPoint.toFloat()) / 2f,
+                    touchedPointX, touchedPointY, paint
+                )
+            }
+        }
+    }
+
+
+
 }
