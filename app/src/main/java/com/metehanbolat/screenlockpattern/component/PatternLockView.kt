@@ -279,6 +279,86 @@ class PatternLockView @JvmOverloads constructor(
         }
     }
 
+    private fun isTouchedDot(pointX: Float, pointY: Float): Boolean {
+        val touchedDot = getTouchedDotByPosition(pointX, pointY) ?: return false
+        if (isDotSelected(touchedDot)) return false
+        markedDotList.takeIf { it.size != 0 }?.last().let { lastTouchedDot ->
+            val rowIndex = (lastTouchedDot!!.rowIndex + touchedDot.rowIndex) / 2
+            val columnIndex = (lastTouchedDot.columnIndex + touchedDot.columnIndex) / 2
+            getDotWithIndex(rowIndex, columnIndex).let { previousDot ->
+                if (isDotSelected(previousDot!!).not()) {
+                    selectDotView(previousDot)
+                }
+            }
+        }
+        if (markedDotList.size != maxCount) selectDotView(touchedDot)
+        return true
+    }
 
+    private fun getTouchedDotByPosition(pointX: Float, pointY: Float) = initialDotList.firstOrNull {
+        ((it.leftPoint) <= pointX && (it.topPoint) <= pointY) && ((it.rightPoint) >= pointX && (it.bottomPoint) >= pointY)
+    }
+
+    private fun isDotSelected(dot: Dot) = markedDotList.firstOrNull { markedDot ->
+        markedDot.rowIndex == dot.rowIndex && markedDot.columnIndex == dot.columnIndex
+    } != null
+
+    private fun getDotWithIndex(rowIndex: Float, columnIndex: Float) = initialDotList.firstOrNull {
+        it.rowIndex == rowIndex && it.columnIndex == columnIndex
+    }
+
+    private fun selectDotView(selectedDot: Dot) {
+        markedDotList.add(selectedDot)
+        if (attrIsDotAnimate) {
+            (((getChildAt(selectedDot.rowIndex.toInt()) as? ViewGroup)
+                ?.getChildAt(selectedDot.columnIndex.toInt()) as? ViewGroup)
+                ?.getChildAt(0) as? DotView)
+                ?.animateDotView()
+        }
+    }
+
+    private fun updateViewState(state: PatternViewState) {
+        @ColorInt val dotColor: Int
+        @ColorInt val lineColor: Int
+        when(state) {
+            is PatternViewState.Success -> {
+                dotColor = state.dotColor
+                lineColor = state.lineColor
+            }
+            is PatternViewState.Error -> {
+                dotColor = state.dotColor
+                lineColor = state.lineColor
+            }
+            else -> {
+                dotColor = attrDotColor
+                lineColor = attrLineColor
+            }
+        }
+        paint.color = lineColor
+        markedDotList.forEach { dot ->
+            (((this.getChildAt(dot.rowIndex.toInt()) as? ViewGroup)
+                ?.getChildAt(dot.columnIndex.toInt()) as? ViewGroup)
+                ?.getChildAt(0) as? DotView)
+                ?.setDotViewColor(dotColor)
+
+        }
+    }
+
+    private fun getDrawnPatternKey() = markedDotList.map { it.key }.joinToString("")
+
+    private fun reset() {
+        state = PatternViewState.Initial
+        updateViewState(state)
+        markedDotList.clear()
+        countDownTimer?.cancel()
+        countDownTimer = null
+        invalidate()
+    }
+
+    fun getPassword(stageState: PatternViewStageState) = stagePasswords[stageState]
+
+    fun setOnChangeStateListener(listener: (state: PatternViewState) -> Unit) {
+        onChangeStateListener = listener
+    }
 
 }
