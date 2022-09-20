@@ -231,6 +231,31 @@ class PatternLockView @JvmOverloads constructor(
         }
     }
 
-    
+    private fun addInitialData() {
+        if (initialDotList.size != 0) return
+
+        forEachIndexed { rowIndex, view ->
+            (view as ViewGroup).forEachIndexed { columnIndex, viewGroup ->
+                (viewGroup as ViewGroup).forEach { nodeView ->
+                    if (nodeView !is DotView) return
+                    nodeView.getLocalVisibleRect(rect)
+                    offsetDescendantRectToMyCoords(nodeView, rect)
+                    initialDotList.add(
+                        Dot(
+                            rowIndex = rowIndex.toFloat(),
+                            columnIndex = columnIndex.toFloat(),
+                            leftPoint = rect.left,
+                            rightPoint = rect.right,
+                            topPoint = rect.top,
+                            bottomPoint = rect.bottom,
+                            key = nodeView.key
+
+                        )
+                    )
+                }
+            }
+        }
+
+    }
 
 }
